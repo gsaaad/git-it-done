@@ -36,6 +36,9 @@ var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repos-search-term");
 
+// 6.5.6 creating a variable for the language buttons
+var languageButtonsEl = document.querySelector("#language-buttons");
+
 //6.2.4 FormHandler
 
 var formSubmitHandler = function (event) {
@@ -133,9 +136,41 @@ var displayRepos = function (repos, searchTerm) {
     //append container to the dom
     repoContainerEl.appendChild(repoEl);
   }
-
-  // console.log(repos, searchTerm);
-  // console.log("from display");
 };
+//6.5.5
+var getFeaturedRepos = function (language) {
+  var apiUrl =
+    "https://api.github.com/search/repositories?q=" +
+    language +
+    "+is:featured&sort=help-wanted-issues";
+
+  fetch(apiUrl).then(function (response) {
+    if (response.ok) {
+      response.json().then(function (data) {
+        console.log(data.items);
+        displayRepos(data.items, language);
+      });
+    } else {
+      alert("Error: Github User Not Found!");
+    }
+  });
+};
+var buttonClickHandler = function (event) {
+  console.log(event);
+  //valid data we want to target (from data-language!)
+  var language = event.target.getAttribute("data-language");
+  console.log(language);
+  //if there's a language property ===true
+  if (language) {
+    //get the featured repo!
+    getFeaturedRepos(language);
+    //this will come first because getFeaturedRepo's is asynchronous.
+    //basically, first clear, then bring me new data from the new click! (of the 3 buttons for languages!)
+    repoContainerEl.textContent = "";
+  }
+};
+// console.log(repos, searchTerm);
+// console.log("from display");
 
 userFormEl.addEventListener("submit", formSubmitHandler);
+languageButtonsEl.addEventListener("click", buttonClickHandler);
